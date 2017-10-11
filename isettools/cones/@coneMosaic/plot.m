@@ -164,14 +164,19 @@ switch ieParamFormat(plotType)
         nCones = size(obj.coneLocs,1);
         locs = obj.coneLocs; pattern = obj.pattern(:);
         if  nCones > maxCones
-            disp('Displaying subsampled (50K) version')
+            disp('Displaying randomly subsampled (50K) cones')
             lst = randi(nCones,[maxCones,1]);
             lst = unique(lst);
             locs = locs(lst,:); pattern = pattern(lst,:);
             
-            % Brighten up in this case
-            support = round([nCones/maxCones,nCones/maxCones]);
-            spread = 2*support(1);
+            % Brighten up - bigger supporter more spread
+            if nCones < 2e5
+                support = [6,6];
+            else 
+                % Make a little bigger.  But this is a lot of cones
+                support = [7,7];
+            end
+            spread = support(1)/2;
         end
         
         [uData.support, uData.spread, uData.delta, uData.mosaicImage] = ...
