@@ -43,6 +43,8 @@ wave = sceneGet(scene,'wave');
 il = illuminantCreate('equal photons',wave,100);
 scene = sceneSet(scene,'illuminant',il);
 
+% We should allow this to be a spectral function, not just equal photons.
+% Though maybe it is enough that we can adjust this on the return.
 img = repmat(img,[1,1,nWave]);
 [img,r,c] = RGB2XWFormat(img);
 illP = illuminantGet(il,'photons');

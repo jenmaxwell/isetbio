@@ -1,9 +1,12 @@
 function [uData, hFig] = visualize(obj,varargin)
-% Visualize aspects of the OI sequence
+% Visualize luminance of the OI sequence
 %
 % Parameter/value
 %  format - {weights, movie, montage}
 %  save   - Save a video file
+%
+% Only the luminance of the sequence is rendered.  Can we get some color
+% here? (BW)
 %
 % NP/BW ISETBIO Team, 2016
 

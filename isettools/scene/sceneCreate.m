@@ -260,7 +260,7 @@ switch sceneName
         end
         scene = sceneMackay(scene,radFreq,sz);
     case {'harmonic','sinusoid'}
-        if isempty(varargin),
+        if isempty(varargin)
             [scene,parms] = sceneHarmonic(scene);
         elseif length(varargin) == 1
             parms = varargin{1};

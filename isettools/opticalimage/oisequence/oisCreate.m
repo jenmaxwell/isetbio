@@ -17,31 +17,36 @@ function [ois, scene] = oisCreate(oisType,composition, modulation, varargin)
 %    
 %    The sequence is a mixture of a fixed OI and a modulated OI. The
 %    mixture is determined by a time series of weights.  The weights are
-%    used for a mixture that is either an addition
+%    used for a mixture that is either an addition, say when oiModulated
+%    has zero mean
 %
 %        oiFixed + w*oiModulated, 
 %
-%    or a blend
+%    or a blend, say when the two both have a DC component
 %
 %        w*oiFixed + (1-w)*oiModulated 
 %
 %  Harmonics
-%   clear hparams
-%   hparams(2) = harmonicP; hparams(2).freq = 6; hparams(2).GaborFlag = .2; 
-%   hparams(1) = hparams(2); hparams(1).contrast = 0; 
-%   sparams.fov = 1; 
-%   stimWeights = ieScale(fspecial('gaussian',[1,50],15),0,1);
-%   ois = oisCreate('harmonic','blend',stimWeights, 'testParameters',hparams,'sceneParameters',sparams);
-%   ois.visualize;
+%{
+  clear hparams
+  hparams(2) = harmonicP; hparams(2).freq = 6; hparams(2).GaborFlag = .2; 
+  hparams(1) = hparams(2); hparams(1).contrast = 0; 
+  sparams.fov = 1; 
+  stimWeights = ieScale(fspecial('gaussian',[1,50],15),0,1);
+  ois = oisCreate('harmonic','blend',stimWeights, 'testParameters',hparams,'sceneParameters',sparams);
+  ois.visualize;
+%}
 %
 %  Vernier
-%   clear vparams; vparams(2) = vernierP; 
-%   vparams(2).name = 'offset'; vparams(2).bgColor = 0; vparams(1) = vparams(2); 
-%   vparams(1).barWidth = 0; vparams(1).bgColor = 0.5; vparams(1).name = 'uniform';
-%   sparams.fov = 1;
-%   stimWeights = ieScale(fspecial('gaussian',[1,50],15),0,1);
-%   [vernier, scenes] = oisCreate('vernier','add', stimWeights,'testParameters',vparams,'sceneParameters',sparams);
-%   vernier.visualize;
+%{
+   clear vparams; vparams(2) = vernierP; 
+   vparams(2).name = 'offset'; vparams(2).bgColor = 0; vparams(1) = vparams(2); 
+   vparams(1).barWidth = 0; vparams(1).bgColor = 0.5; vparams(1).name = 'uniform';
+   sparams.fov = 1;
+   stimWeights = ieScale(fspecial('gaussian',[1,50],15),0,1);
+   [vernier, scenes] = oisCreate('vernier','add', stimWeights,'testParameters',vparams,'sceneParameters',sparams);
+   vernier.visualize;
+%}
 %
 %   ieAddObject(scenes{1}); ieAddObject(scenes{2}); sceneWindow;
 %
