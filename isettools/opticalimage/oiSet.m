@@ -175,7 +175,7 @@ switch parm
     case {'lens', 'lenspigment'}
         oi.optics.lens = val;
 
-    case {'photons', 'cphotons', 'compressedphotons'}
+    case {'photons'}
         % oiSet(oi,'photons',val)
         % cphotons is obsolete and should not be used.  It will go away
         % before long.
@@ -231,18 +231,13 @@ switch parm
         oi.data.illuminance = val;
 
     case {'meanillum', 'meanilluminance'}
-        oi.data.meanIll = val;
-
-        % 
-        %     case {'spectrum','wavespectrum','wavelengthspectrumstructure'}
-        %         % Set spectrum structure
-        %         if ~isfield(val, 'wave'), error('Invalid spectrum structure'); end
-        %         % adjust wavelength sampling
-        %         if isfield(oi, 'spectrum')
-        %             oi = oiSet(oi, 'wave', val.wave);
-        %         else
-        %             oi.spectrum = val;
-        %         end
+        % oiSet(oi,'mean illuminance',lux)
+        mn = oiGet(oi,'mean illuminance');  % Current mean
+        if mn ~= val
+            oi.data.photons = oi.data.photons*(val/mn);
+            oi.data.illuminance = oiCalculateIlluminance(oi);
+        end
+        
     case {'datawave','datawavelength','wave','wavelength'}
         % oi = oiSet(oi,'wave',val)
         % The units are always nanometers.
@@ -258,7 +253,7 @@ switch parm
         % Set the data wavelength term, for now stored in spectrum.  It
         % will get shifted to oi.data.wave at some point.
         if checkfields(oi,'spectrum'), oldWave = oi.spectrum.wave; 
-        else oldWave = [];
+        else, oldWave = [];
         end
         oi.spectrum.wave = val(:);
         

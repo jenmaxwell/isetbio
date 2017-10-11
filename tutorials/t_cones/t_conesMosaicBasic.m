@@ -1,15 +1,12 @@
 %%t_coneMosaicBasic  Basic introduction to the cone mosaic object.
 %
-% Description:
-%    Show how to create a cone mosaic object and compute cone isomerizatoins
-%    across a set of small eye movements.  This lets you look at the
-%    result in the coneMosaic window.
+% Shows how to create a cone mosaic object and compute cone
+% isomerizations across a set of small eye movements.  This lets you
+% look at the result in the coneMosaic window.
 %
-% [DHB NOTE: Either we should show how to access fields of the mosaic programatically
-% here, or we should point to a different tutorial that does so.]
 
 %% Initialize and clear
-clear; close all; ieInit;
+ieInit;
 
 %% Build a simple scene and oi (retinal image) for computing
 %
@@ -43,5 +40,15 @@ cMosaic.compute(oi);
 % the movie of fixations.
 cMosaic.window;
 
-%%
+%% Change some of the variables
+
+cMosaic.macular.density = 0.0;   % Smokers
+cMosaic.compute(oi);
+cMosaic.window;
+cMosaic.plot('hline absorptions lms','xy',[25,25]);   % Circle not coming up on cone mosaic screen
+
+cMosaic.macular.density = 0.35;   % Non-smokers
+cMosaic.compute(oi);
+cMosaic.window;
+cMosaic.plot('hline absorptions lms','xy',[25,25]);
 

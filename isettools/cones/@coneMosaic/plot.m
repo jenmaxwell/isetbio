@@ -27,6 +27,8 @@ function [uData, hf] = plot(obj, plotType, varargin)
 %         plots 
 %  'x' - x value (col) for vline plots 
 %  'y' - y value (row) for hline plots
+%  'xy' - [x,y] vector (col, row) for vline plots.  Not sure we should
+%         have 'x' and 'y' separately, as well.
 %   
 % Outputs:
 %   hf    - figure or axes handle
@@ -34,7 +36,8 @@ function [uData, hf] = plot(obj, plotType, varargin)
 %
 % @conemosaic.plot('help') lists the valid plot types
 %  N.B. The '*' means user must select a point on an image to specify the
-%  location of the point or line to be plotted).
+%  location of the point or line to be plotted). Though in some cases,
+%  an 'xy' argument is already parsed.  Should become true for all.
 %
 %   Cone mosaic            - Color image of the cone arrangement
 %
@@ -45,11 +48,11 @@ function [uData, hf] = plot(obj, plotType, varargin)
 %
 % 	hline absorptions*     - Graph of a horizontal line of absoprtions
 % 	hline current*         - 
-% 	hline absorptions lms* - Three panel graph of LMS absorptions
-% 	hline current lms*     - Three panel graph of LMS current
+% 	hline absorptions lms* - LMS absorptions on a horizontal line
+% 	hline current lms*     - Graph of LMS current
 % 	vline absorptions*     - Vertical line
 % 	vline current*
-% 	vline absorptions lms*
+% 	vline absorptions lms* - LMS absorptions on a vertical line
 % 	vline current lms*
 % 	time series absorptions* - Cone absorptions Graph of a point
 % 	time series current*     - Cone photocurrent Graph of a point
@@ -68,6 +71,8 @@ function [uData, hf] = plot(obj, plotType, varargin)
 %  Examples:
 %   coneMosaic.plot('impulse response')
 %   coneMosaic.plot('cone mosaic')
+%   coneMosaic.plot('hline absorptions lms','xy',[10,10])
+%
 %
 % HJ/BW, ISETBIO TEAM, 2016
 
@@ -75,7 +80,7 @@ function [uData, hf] = plot(obj, plotType, varargin)
 % Think about coneImageActivity function at end.
 
 %% Check plot type string if we send this off to the os plot routine
-%
+
 % (Might Find a cleaner way to check and send to os.plot.
 %  Maybe create a parse argument string as in ISET.)
 if (length(plotType) > 3 && strcmp(plotType(1:3),'os '))
@@ -109,7 +114,7 @@ if isequal(plotType,'help')
     end
     return;
 else
-    % Makes less readable, but better for programming. I
+    % Makes less readable, but better for programming.
     for ii=1:length(validPlots)
         validPlots{ii} = ieParamFormat(validPlots{ii});
     end
@@ -129,6 +134,7 @@ p.addParameter('hf', []);                     % Figure handle
 p.addParameter('oi',[],@isstruct);            % Used for spectral qe
 p.addParameter('x',[],@isscalar);             % x axis value
 p.addParameter('y',[],@isscalar);             % y axis value
+p.addParameter('xy',[],@isvector);            % [x,y] vector
 
 p.parse(obj,plotType, varargin{:});
 hf = p.Results.hf;
@@ -217,6 +223,8 @@ switch ieParamFormat(plotType)
         data = mean(obj.absorptions,3);
         
         % The plots below are with respect to a point.
+        % If (x,y) are not sent in, get them
+        
         % Get the point
         [x, y] = ginput(1); % Rounded and clipped to the data
         x = ieClip(round(x), 1, size(data, 2));
@@ -240,37 +248,47 @@ switch ieParamFormat(plotType)
     case {'hlineabsorptionslms','vlineabsorptionslms'}
         data = mean(obj.absorptions,3);
         
-        % The plots below are with respect to a point.
-        % Get the point
-        [x, y] = ginput(1); % Rounded and clipped to the data
-        x = ieClip(round(x), 1, size(data, 2));
-        y = ieClip(round(y), 1, size(data, 1));        %
+        % The plots below are with respect to a point.  This can be
+        % sent in, or we can get it interactively
+        if isempty(p.Results.xy)
+            % Get the point
+            [x, y] = ginput(1); % Rounded and clipped to the data
+            x = ieClip(round(x), 1, size(data, 2));
+            y = ieClip(round(y), 1, size(data, 1));        %
+        else
+            x = p.Results.xy(1); y = p.Results.xy(2);
+        end
+        
+        % Put up a circle at the point
         viscircles([x,y],0.7);
 
-        vcNewGraphWin([],'tall'); names = 'LMS';
+        % vcNewGraphWin([],'tall'); names = 'LMS';
+        vcNewGraphWin; % names = 'LMS';
         c = {'ro-','go-','bo-'};
         yStr = 'Absorptions per frame';
         if isequal(plotType(1),'v')
             c = {'ro-','go-','bo-'};
             for ii = 2 : 4 % L, M, S
-                subplot(3, 1, ii-1);
+                % subplot(3, 1, ii-1);
                 pos = find(obj.pattern(:, x) == ii);
                 plot(pos, data(pos, x), c{ii-1}, 'LineWidth', 2); grid on;
                 uData.pos{ii-1} = pos; uData.data{ii-1}=data(pos,x);
-                xlabel('Vertical Position (cones');
-                ylabel([names(ii-1) ' ' yStr]);
-                set(gca,'xlim',[1 size(data,1)]);
+                hold on;
             end
+            xlabel('Vertical Position (cones');
+            ylabel(yStr);
+            set(gca,'xlim',[1 size(data,1)]);
         else
             for ii = 2 : 4 % L, M, S
-                subplot(3, 1, ii-1);
+                % subplot(3, 1, ii-1);
                 pos = find(obj.pattern(y, :) == ii);
                 plot(pos, data(y, pos), c{ii-1}, 'LineWidth', 2); grid on;
                 uData.pos{ii-1} = pos; uData.data{ii-1}=data(y,pos);
-                xlabel('Horizontal Position (cones');
-                ylabel([names(ii-1) ' ' yStr]);
-                set(gca,'xlim',[1 size(data,2)]);
+                hold on;
             end
+            xlabel('Horizontal Position (cones');
+            ylabel(yStr);
+            set(gca,'xlim',[1 size(data,2)]);
         end
 
     case 'timeseriesabsorptions'
@@ -354,30 +372,30 @@ switch ieParamFormat(plotType)
         y = ieClip(round(y), 1, size(data, 1));        %
         viscircles([x,y],0.7);
 
-        vcNewGraphWin([],'tall'); names = 'LMS';
+        vcNewGraphWin([],'tall'); % names = 'LMS';
         c = {'ro-','go-','bo-'};
         yStr = 'Photocurrent (pA)';
         if isequal(plotType(1),'v')
             c = {'ro-','go-','bo-'};
             for ii = 2 : 4 % L, M, S
-                subplot(3, 1, ii-1);
+                % subplot(3, 1, ii-1);
                 pos = find(obj.pattern(:, x) == ii);
                 plot(pos, data(pos, x), c{ii-1}, 'LineWidth', 2); grid on;
                 uData.pos{ii-1} = pos; uData.data{ii-1}=data(pos,x);
-                xlabel('Vertical Position (cones');
-                ylabel([names(ii-1) ' ' yStr]);
-                set(gca,'xlim',[1 size(data,1)]);
             end
+            xlabel('Vertical Position (cones');
+            ylabel(yStr);
+            set(gca,'xlim',[1 size(data,1)]);
         else
             for ii = 2 : 4 % L, M, S
-                subplot(3, 1, ii-1);
+                % subplot(3, 1, ii-1);
                 pos = find(obj.pattern(y, :) == ii);
                 plot(pos, data(y, pos), c{ii-1}, 'LineWidth', 2); grid on;
                 uData.pos{ii-1} = pos; uData.data{ii-1}=data(y,pos);
-                xlabel('Horizontal Position (cones');
-                ylabel([names(ii-1) ' ' yStr]);
-                set(gca,'xlim',[1 size(data,2)]);
             end
+            xlabel('Horizontal Position (cones');
+            ylabel(yStr);
+            set(gca,'xlim',[1 size(data,2)]);
         end
     case 'timeseriescurrent'
         data = obj.current;

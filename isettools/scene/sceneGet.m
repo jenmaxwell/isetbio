@@ -49,7 +49,6 @@ function val = sceneGet(scene,parm,varargin)
 %        {'peak radiance and wave'} - peak radiance and its wavelength
 %        {'datamax'}     - max radiance value (across all waves)
 %        {'datamin'}     - min radiance value
-%        {'compressbitdepth'}  - 16 bits, usually, of compression
 %        {'energy'}         - radiance data (energy)
 %        {'mean energy spd'}  - mean spd in energy units
 %        {'mean photons spd'} - mean spd in photon units
@@ -211,7 +210,7 @@ switch parm
             % Use the current scene information
             val = sceneGet(vcGetObject('SCENE'),'aspectRatio');
             return;
-        else val = r/c;
+        else, val = r/c;
         end
     case {'magnification','mag'}
         % Scenes always have a magnification of 1. Optical image mag
@@ -238,9 +237,9 @@ switch parm
             if ~isempty(varargin), val = val*ieUnitScaleFactor(varargin{1}); end
         end
     case 'data'
-        if checkfields(scene,'data'), val = scene.data; end;
+        if checkfields(scene,'data'), val = scene.data; end
         
-    case {'photons','cphotons'}
+    case {'photons'}
         % sceneGet(scene,'photons',[wavelength]);
         % Read photon data.  It is possible to ask for just a single
         % waveband.
@@ -266,7 +265,7 @@ switch parm
         % So, [col,row,0,0] returns 1 point and [col,row,1,1] returns 4
         % points.
         if isempty(varargin), error('ROI required')
-        else roiLocs = varargin{1};
+        else, roiLocs = varargin{1};
         end
         val = vcGetROIData(scene,roiLocs,'photons');
         
@@ -274,7 +273,7 @@ switch parm
         % sceneGet(scene,'roi mean photons', roi)
         % Return the mean photon spd in a region of interest
         if isempty(varargin), error('ROI required')
-        else roiLocs = varargin{1};
+        else, roiLocs = varargin{1};
         end
         val = sceneGet(scene,'roi photons', roiLocs);
         val = mean(val,1);
@@ -315,7 +314,7 @@ switch parm
         % Return the reflectance in a region of interest
         % XW format
         if isempty(varargin), error('ROI required');
-        else roiLocs = varargin{1};
+        else, roiLocs = varargin{1};
         end
         
         sPhotons = vcGetROIData(scene,roiLocs,'photons');
@@ -343,7 +342,7 @@ switch parm
         %
         % Return the mean reflectance spd in a region of interest
         if isempty(varargin), error('ROI required')
-        else roiLocs = varargin{1};
+        else, roiLocs = varargin{1};
         end
         val = sceneGet(scene,'roi reflectance', roiLocs);
         val = mean(val,1);
@@ -355,7 +354,7 @@ switch parm
         % wavelengths are passed, then the peak at all wavelength is
         % returned in a vector.
         if isempty(varargin), wave = sceneGet(scene,'wave');
-        else wave = varargin{1};
+        else, wave = varargin{1};
         end
         nWave = length(wave);
         val = zeros(nWave,1);
@@ -374,23 +373,25 @@ switch parm
         val = [p,wave(ii)];
     case {'datamax','dmax','peakphoton'}
         if checkfields(scene,'data','dmax'), val = scene.data.dmax;
-        else p = sceneGet(scene, 'photons'); val = max(p(:)); end
+        else, p = sceneGet(scene, 'photons'); val = max(p(:)); end
     case {'datamin','dmin','minphoton'}
         if checkfields(scene,'data','dmin'), val = scene.data.dmin;
-        else p = sceneGet(scene, 'photons'); val = min(p(:)); end
+        else, p = sceneGet(scene, 'photons'); val = min(p(:)); end
     case {'knownreflectance'}
         % We store the peak reflectance to set the illuminant level
         % properly and to plot reflectances.
         if checkfields(scene,'data','knownReflectance')
             val = scene.data.knownReflectance;
         end
-    case {'bitdepth','compressbitdepth'}
+    case {'bitdepth'}
+        % This should go away.
+        val = 32;
         if checkfields(scene,'data','bitDepth'), val = scene.data.bitDepth; end
         
     case 'energy'
         % sceneGet(scene,'energy',[wavelength]);
         % Get the energy, possibly just one waveband
-        if isempty(varargin),
+        if isempty(varargin)
             val = sceneGet(scene,'photons');
             wave = sceneGet(scene,'wave');
             [XW,r,c] = RGB2XWFormat(val);
@@ -414,7 +415,7 @@ switch parm
         % So, [col,row,0,0] returns 1 point and [col,row,1,1] returns 4
         % points.
         if isempty(varargin), error('ROI required')
-        else roiLocs = varargin{1};
+        else, roiLocs = varargin{1};
         end
         val = vcGetROIData(scene,roiLocs,'energy');
        
@@ -422,7 +423,7 @@ switch parm
         % sceneGet(scene,'roi mean energy', roi)
         % Return the mean energy spd in a region of interest
         if isempty(varargin), error('ROI required')
-        else roiLocs = varargin{1};
+        else, roiLocs = varargin{1};
         end
         val = sceneGet(scene,'roi energy', roiLocs);
         val = mean(val,1);
@@ -469,7 +470,7 @@ switch parm
         wave   = sceneGet(scene,'wave');
         S      = ieReadSpectra('stockman',wave);
         if numel(wave) > 1, dWave = wave(2) - wave(1);
-        else                dWave = 10; disp('10 nm bandwidth assumed');
+        else,               dWave = 10; disp('10 nm bandwidth assumed');
         end
         [energy,r,c] = RGB2XWFormat(energy);
         val = energy*S*dWave;
@@ -484,7 +485,7 @@ switch parm
         % integration ranges.
         wave = sceneGet(scene,'wave');
         if length(wave) > 1, val = wave(2) - wave(1);
-        else val = 1;
+        else, val = 1;
         end
     case {'wave','wavelength'}
         % Always a column vector, even if people stick it in the wrong way.
@@ -590,7 +591,7 @@ switch parm
         % val = sceneGet(scene,'frequencyResolution','mm');
         % val = sceneGet(scene,'frequencyResolution','cpd');
         if isempty(varargin), units = 'cyclesPerDegree';
-        else units = varargin{1};
+        else, units = varargin{1};
         end
         val = sceneFrequencySupport(scene,units);
     case {'maxfrequencyresolution','maxfreqres'}
@@ -600,7 +601,7 @@ switch parm
         % you can get cycles/{meters,mm,microns}
         %
         if isempty(varargin), units = 'cyclesPerDegree';
-        else units = varargin{1};
+        else, units = varargin{1};
         end
         % val = sceneFrequencySupport(scene,units);
         if isempty(varargin), units = []; end
@@ -609,7 +610,7 @@ switch parm
     case {'frequencysupport','fsupportxy','fsupport2d','fsupport'}
         % val = sceneGet(scene,'frequencyResolution',units);
         if isempty(varargin), units = 'cyclesPerDegree';
-        else units = varargin{1};
+        else, units = varargin{1};
         end
         fResolution = sceneGet(scene,'frequencyresolution',units);
         [xSupport, ySupport] = meshgrid(fResolution.fx,fResolution.fy);
@@ -617,14 +618,14 @@ switch parm
     case {'frequencysupportcol','fsupportx'}
         % val = sceneGet(scene,'frequencyResolution',units);
         if isempty(varargin), units = 'cyclesPerDegree';
-        else units = varargin{1};
+        else, units = varargin{1};
         end
         fResolution = sceneGet(scene,'frequencyresolution',units);
         l=find(abs(fResolution.fx) == 0); val = fResolution.fx(l:end);
     case {'frequencysupportrow','fsupporty'}
         % val = sceneGet(scene,'frequencyResolution',units);
         if isempty(varargin), units = 'cyclesPerDegree';
-        else units = varargin{1};
+        else, units = varargin{1};
         end
         fResolution = sceneGet(scene,'frequencyresolution',units);
         l=find(abs(fResolution.fy) == 0); val = fResolution.fy(l:end);
@@ -645,7 +646,7 @@ switch parm
         
         il = sceneGet(scene,'illuminant');
         if isempty(il), disp('No scene illuminant.'); return;
-        else            val = illuminantGet(il,'illuminant format');
+        else,           val = illuminantGet(il,'illuminant format');
         end
         
     case {'illuminantphotons'}
@@ -662,7 +663,7 @@ switch parm
         % If spectral, then just the illuminant data in a c
         %
         if isempty(varargin), error('ROI required');
-        else roi = varargin{1};
+        else, roi = varargin{1};
         end
         val = vcGetROIData(scene,roi,'illuminant photons');
         
@@ -670,7 +671,7 @@ switch parm
         % sceneGet(scene,'roi mean illuminant photons', roi)
         % Return the mean illuminant photon spd in a region of interest
         if isempty(varargin), error('ROI required')
-        else roiLocs = varargin{1};
+        else, roiLocs = varargin{1};
         end
         val = sceneGet(scene,'roi illuminant photons', roiLocs);
         val = mean(val,1);
@@ -725,9 +726,9 @@ switch parm
         if isempty(varargin)
             sceneW = ieSessionGet('scene window handle');
             if isempty(sceneW), gam = 1;
-            else gam = str2double(get(sceneW.editGamma,'string'));
+            else, gam = str2double(get(sceneW.editGamma,'string'));
             end
-        else gam = varargin{1};
+        else, gam = varargin{1};
         end
         
         % Render the rgb image from photons.  Rather than use the

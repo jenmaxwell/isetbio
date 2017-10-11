@@ -135,7 +135,7 @@ switch parm
     case {'data','datastructure'}
         scene.data = val;
         
-    case {'photons','cphotons','compressedphotons'}
+    case {'photons'}
         % sceneSet(scene,'photons',val,[wavelength])
         % val is typically a 3D (row,col,wave) matrix.
       
