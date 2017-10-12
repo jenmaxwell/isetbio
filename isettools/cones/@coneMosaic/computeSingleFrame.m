@@ -83,17 +83,17 @@ if (obj.apertureBlur)
     end
     
     % Make the kernal and make the circular pillbox with unit volume.
-    apertureKernal = zeros(apertureSamples,apertureSamples);
+    apertureKernel = zeros(apertureSamples,apertureSamples);
     [apertureRows,apertureCols] = meshgrid(sample2space(1:apertureSamples,1:apertureSamples,oiRes,oiRes));
     apertureRadii = sqrt(apertureRows.^2+apertureCols.^2);
-    apertureKernal(apertureRadii <= apertureRadius) = 1;
-    apertureKernal = apertureKernal./sum(apertureKernal(:));
+    apertureKernel(apertureRadii <= apertureRadius) = 1;
+    apertureKernel = apertureKernel./sum(apertureKernel(:));
  
     % Do the convolution for each cone type.
     %
     % In the loop over cone types, 1 means blank/black so we just iterate 2:4.
     for ii = 2:4
-        absorbDensityLMS(:,:,ii-1) = conv2(absorbDensityLMS(:,:,ii-1),apertureKernal,'same');
+        absorbDensityLMS(:,:,ii-1) = conv2(absorbDensityLMS(:,:,ii-1),apertureKernel,'same');
     end 
 end
 

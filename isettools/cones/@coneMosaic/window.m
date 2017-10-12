@@ -1,11 +1,11 @@
-function window(obj, varargin)
+function h = window(obj, varargin)
 %WINDOW  Opens a cone mosaic window GUI.
 %
 %   Inputs:
 %   None.
 %
 %   Outputs:
-%   None.
+%   Figure handle to the window.
 %
 %   Optional key/value pairs:
 %   None.
@@ -14,5 +14,5 @@ function window(obj, varargin)
 
 % HJ ISETBIO Team 2016
 
-    coneMosaicWindow(obj);
+    h = coneMosaicWindow(obj);
 end

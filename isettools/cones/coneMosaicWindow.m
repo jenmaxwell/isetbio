@@ -403,6 +403,8 @@ switch ieParamFormat(source.Label)
     case 'vlinelms'
         cmd = ['vline',dataType,'lms'];
     case 'timeseries'
+        % BW:  When we are showing the cone mosaic, the plot is all zeros.
+        % It appears to be getting the wrong type of data.
         cmd = ['time series',dataType];
     otherwise
         error('Unknown plot type %s\n',source.label);

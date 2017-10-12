@@ -41,7 +41,6 @@ function [oi,fullName] = oiSPDScale(oi,fullName,op,skipIlluminant)
 
 if notDefined('scene'), [~, oi] = vcGetSelectedObject('OI'); end
 if notDefined('fullName'), fullName = vcSelectDataFile('lights'); end
-if notDefined('skipIlluminant'),  skipIlluminant = 0; end
 if isempty(fullName), return; end
 
 % NOTE:  Check that the wavelength representations of the different objects
@@ -73,23 +72,12 @@ switch op
         %    energy(:,:,ii) = energy(:,:,ii)/spd(ii);
         % end
         energy = bsxfun(@rdivide, energy, reshape(spd, [1 1 nWave]));
-        if ~skipIlluminant
-            illE = oiGet(oi,'illuminantEnergy');
-            illE = illE(:)./spd(:);
-        end
 
     case {'multiply','*'}
         % for ii=1:nWave
         %     energy(:,:,ii) = energy(:,:,ii)*spd(ii);
         % end
         energy = bsxfun(@times, energy, reshape(spd, [1 1 nWave]));
-        if ~skipIlluminant
-            illE = oiGet(oi,'illuminantEnergy');
-            if isempty(illE)
-                error('No illuminant data');
-            end
-            illE = illE(:).*spd(:);
-        end
 
     case {'add','+','sum', 'plus'}
         % for ii=1:nWave
@@ -105,14 +93,10 @@ end
 % Place the adjusted data in the scene structure
 [XW,r,c,~] = RGB2XWFormat(energy);
 photons = XW2RGBFormat(Energy2Quanta(wave,XW')',r,c);
-oi   = sceneSet(oi,'cphotons',photons);
-if ~skipIlluminant
-    oi   = sceneSet(oi,'illuminant energy',illE);
-end
+oi   = oiSet(oi,'photons',photons);
 
 % Update the scene luminance information
-[lum,meanL] = sceneCalculateLuminance(oi);
-oi = sceneSet(oi,'luminance',lum);
-oi = sceneSet(oi,'meanl',meanL);
+illuminance = oiCalculateIlluminance(oi);
+oi = oiSet(oi,'illuminance',illuminance);
 
 end
