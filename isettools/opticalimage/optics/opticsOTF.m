@@ -116,7 +116,6 @@ for ii=1:length(wave)
     % this in years, however.
     % figure(1); imagesc(abs(filteredIMG)); colormap(gray)
     %
-    % What about dmin and dmax on the 'cphotons' set.  Is that OK?
     % oi = oiSet(oi,'photons',filteredIMG,wave(ii));
     p(:,:,ii) = filteredIMG;
 end

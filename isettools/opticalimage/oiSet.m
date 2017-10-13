@@ -33,18 +33,6 @@ function oi = oiSet(oi,parm,val,varargin)
 %    oi = oiSet(oi,'optics',optics);
 %    oi = oiSet(oi,'optics fnumber',2.8); oiGet(oi,'optics fnumber')
 %
-% N.B.: Because of the large size of the photon data (row,col,wavelength)
-% and the high dynamic range, they are stored in a special compressed
-% format.  They also permit the user to read and write individual
-% wavelength planes. Data sent in and returned are always in double()
-% format.
-%
-% When you write to 'photons', the compression fields used by cphotons are
-% cleared. When reading and writing a waveband in compressed mode, it is
-% assumed that the compression fields already exist.  We do not compress
-% each individual waveband, though this would be possible (i.e., to have an
-% array of min/max values for each waveband).
-%
 % After writing to the photons field, the illuminance and mean illuminance
 % fields are set to empty.
 %
@@ -57,8 +45,8 @@ function oi = oiSet(oi,parm,val,varargin)
 %      {'magnification'}
 %
 %      {'data'}  - Irradiance information
-%        {'cphotons'}   - Compressed photons; can be set one waveband at a
-%                         time: oi = oiSet(oi,'cphotons',data,wavelength);
+%        {'photons'}   - photons; can be set one waveband at a
+%                         time: oi = oiSet(oi,'photons',data,wavelength);
 %
 % Wavelength information
 %      {'spectrum'}            - Spectrum structure

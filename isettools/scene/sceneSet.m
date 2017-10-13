@@ -94,7 +94,7 @@ parm = ieParamFormat(parm);
 
 switch parm 
     case {'name','scenename'}
-        if ischar(val), scene.name = val; else error('val is not str'); end
+        if ischar(val), scene.name = val; else, error('val is not str'); end
     case 'type'
         scene.type = val;
     case {'filename'}
@@ -189,14 +189,14 @@ switch parm
             photons(:,:,ii) = reshape(tmp,r,c);
         end
         % close(h);
-        scene = sceneSet(scene,'cphotons',photons);
+        scene = sceneSet(scene,'photons',photons);
 
     case {'peakradiance','peakphotonradiance'}
         % Used with monochromatic scenes to set the radiance in photons.
         % scene = sceneSet(scene,'peak radiance',1e17);
         oldPeak = sceneGet(scene,'peak radiance');
         p  = sceneGet(scene,'photons');
-        scene = sceneSet(scene,'cphotons',val*(p/oldPeak));
+        scene = sceneSet(scene,'photons',val*(p/oldPeak));
     case {'peakenergyradiance'}
         % As above, but for energy.  Useful for equating energy in a series
         % of monochromatic images.
@@ -218,7 +218,7 @@ switch parm
         % Bit depth controls whether the data are stored as single (32) or
         % double (64)
         if val ~= 32 && val ~=64, error('Bad bit depth %i\n',val);
-        else                      scene.data.bitDepth = val;
+        else,                     scene.data.bitDepth = val;
         end
         % scene = sceneClearData(scene);
         
@@ -238,7 +238,7 @@ switch parm
         % is dangerous because this value could be inconsistent with the
         % photons if we are not careful.
         if strcmp(sceneGet(scene,'type'),'scene'), scene.data.luminance = val;
-        else error('Cannot set luminance of a non-scene structure.');
+        else, error('Cannot set luminance of a non-scene structure.');
         end
     case {'meanluminance','meanl'}
         % This leaves open the possibility that the mean differs from the
