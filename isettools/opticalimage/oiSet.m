@@ -211,7 +211,8 @@ switch parm
         error('datamin and datamax are not used anymore');
         % oi.data.dmax = val;
     case 'bitdepth'
-        % Only used by compressed photons
+        % Only used by compressed photons - which should be
+        % deprecated.
         oi.data.bitDepth = val;
 
     case {'illuminance', 'illum'}

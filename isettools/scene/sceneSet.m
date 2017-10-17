@@ -73,8 +73,10 @@ function scene = sceneSet(scene,parm,val,varargin)
 %
 % Private variables used by ISET but not set by the user
 %
-%    Used for management of compressed photons
+%    Used for management of compressed photons - deprecated
 %      {'bitdepth'}
+%
+%    Deprecated, too.
 %      {'knownReflectance'} - For scenes when a reflectance is known
 %                             (reflectance,i,j,w)
 %
